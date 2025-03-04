@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  base: "/Porfolio-3D/",
+  base: "/portfolio-3d/",
   build: {
     chunkSizeWarningLimit: 1000,
   },

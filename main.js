@@ -223,7 +223,7 @@ gltfLoader.load(
 
         // LIVRO
         const bookTexture = new THREE.TextureLoader().load(
-          "textures/book-inner.jpg"
+          "textures/book-inner.png"
         );
         bookTexture.flipY = false;
         child.material = new THREE.MeshStandardMaterial({

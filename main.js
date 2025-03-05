@@ -709,22 +709,32 @@ function aboutMenuListener() {
   });
 }
 
+function updateProjectScales() {
+  const scaleFactor = window.innerWidth < 768 ? 0.5 : 1;
+  projects.forEach((project) => {
+    project.mesh.scale.set(2 * scaleFactor, 2 * scaleFactor, 2 * scaleFactor);
+  });
+}
+
 function projectsMenuListener() {
   projects.forEach((project, i) => {
     const colIndex = i % 3 === 0 ? 0 : 1;
     const rowIndex = Math.floor(i / 3);
-    const geometry = new THREE.PlaneGeometry(0.85, 0.4);
+
+    const baseWidth = window.innerWidth < 768 ? 0.5 : 0.85;
+    const baseHeight = window.innerWidth < 768 ? 0.3 : 0.4;
+
+    const geometry = new THREE.PlaneGeometry(baseWidth, baseHeight);
     const material = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       map: new THREE.TextureLoader().load(project.image),
       transparent: true,
       opacity: 0.0,
     });
+
     const projectPlane = new THREE.Mesh(geometry, material);
     projectPlane.name = "project";
-    projectPlane.userData = {
-      url: project.url,
-    };
+    projectPlane.userData = { url: project.url };
     projectPlane.position.set(
       1 + i * 0.1 * colIndex,
       -0.1 - rowIndex * 0.1,
@@ -733,7 +743,7 @@ function projectsMenuListener() {
     projectPlane.scale.set(0, 0, 0);
 
     projects[i].mesh = projectPlane;
-    projects[i].y = 0.5 - rowIndex * 0.9;
+    projects[i].y = 0.5 - rowIndex * 1.5;
     scene.add(projectPlane);
   });
 
@@ -743,32 +753,32 @@ function projectsMenuListener() {
       e.preventDefault();
       disableOrbitControls();
       resetBookCover();
-      gsap.to(camera.position, {
-        ...projectsCameraPos,
-        duration: 1.5,
-      });
-      gsap.to(camera.rotation, {
-        ...projectsCameraRot,
-        duration: 1.5,
-      });
+      gsap.to(camera.position, { ...projectsCameraPos, duration: 1.5 });
+      gsap.to(camera.rotation, { ...projectsCameraRot, duration: 1.5 });
       gsap.delayedCall(1.5, enableCloseBtn);
 
       projects.forEach((project, i) => {
-        project.mesh.scale.set(2, 2, 2);
+        gsap.to(project.mesh.scale, {
+          x: 2 * (window.innerWidth < 768 ? 1 : 1),
+          y: 2 * (window.innerWidth < 768 ? 1 : 1),
+          z: 2 * (window.innerWidth < 768 ? 1 : 1),
+          duration: 1,
+        });
         gsap.to(project.mesh.material, {
           opacity: 1,
           duration: 1,
           delay: 1.5 + i * 0.1,
         });
         gsap.to(project.mesh.position, {
-          y: project.y + 0.0,
+          y: project.y,
           duration: 1,
           delay: 1.5 + i * 0.1,
         });
       });
     });
-}
 
+  window.addEventListener("resize", updateProjectScales);
+}
 function init3DWorldClickListeners() {
   const mousePosition = new THREE.Vector2();
   const raycaster = new THREE.Raycaster();
